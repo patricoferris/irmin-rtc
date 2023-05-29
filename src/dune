@@ -1,0 +1,6 @@
+(library
+ (name irmin_rtc)
+ (public_name irmin-rtc)
+ (preprocess
+  (pps ppx_irmin))
+ (libraries irmin brr unix jsoo-rtc))

@@ -1,0 +1,14 @@
+(executable
+ (name index)
+ (modes js)
+ (preprocess
+  (pps ppx_deriving_brr))
+ (libraries
+  brr
+  unix
+  jsoo-rtc
+  code-mirror
+  irmin-rtc
+  irmin-indexeddb
+  digestif.ocaml
+  cmarkit))
