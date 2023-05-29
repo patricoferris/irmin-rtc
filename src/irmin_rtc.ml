@@ -32,22 +32,27 @@ module Make (S : Irmin.S) = struct
           @@ Irmin.Type.to_json_string ~minify:true incoming_t (Fetch branch))
           dc;
         complete >>= fun res ->
-        match res with
+        (match res with
         | Error _ as e -> Lwt.return e
         | Ok (slice, h) -> (
             let repo = S.repo t in
             (* Check for commit in store *)
             S.Commit.of_hash repo h >>= function
-            | Some _ -> Lwt.return_ok (Some h)
+            | Some c ->
+              S.Head.set t c >>= fun () ->
+              Lwt.return_ok (Some h)
             | None -> (
                 S.Repo.import repo slice >>= fun v ->
                 match v with
                 | Error _ as e -> Lwt.return e
                 | Ok () -> (
                     S.Commit.of_hash repo h >>= function
-                    | Some _ -> Lwt.return_ok (Some h)
+                    | Some c ->
+                      S.Head.set t c >>= fun () ->
+                      Lwt.return_ok (Some h)
                     | None -> Lwt.return (Error (`Msg "Failed to import slice"))
-                    )))
+                    ))))
+
 
       let push t ?depth dc (branch : branch) =
         let repo = S.repo t in

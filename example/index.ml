@@ -101,7 +101,7 @@ let _handle_change () =
 let sync_store store (dc : Rtc.DataChannel.t) =
   let open Lwt.Infix in
   Console.log [ "Sync store" ];
-  Sync.pull_exn store (Store.E dc) `Set >>= fun status ->
+  Sync.pull_exn store (Store.E dc) (`Merge (info "merging")) >>= fun status ->
   Store.get store [ "index.md" ] >|= fun c -> Console.log [ status; c ]
 
 let setup_rtc () =
@@ -237,7 +237,6 @@ let main () =
       in
       let ext = F.of_ facet view_update in
       let+ saved = Store.find main [ "index.md" ] in
-      Brr.Console.log [ saved ];
       let doc =
         Option.map (fun s -> String.concat "\n" s |> Jstr.of_string) saved
       in
